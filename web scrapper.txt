@@ -12,7 +12,8 @@ if response.status_code == 200:
     
     # Extract data (example: all paragraphs)
     paragraphs = soup.find_all('p')
-    for para in paragraphs:
+    for par in paragraphs:
         print(para.get_text())
 else:
+
     print(f"Failed to fetch the page. Status code: {response.status_code}")
