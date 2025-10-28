@@ -1,0 +1,42 @@
+import requests
+import json
+import time
+
+class APICollector:
+    def __init__(self, base_url, api_key=None):
+        self.base_url = base_url
+        self.api_key = api_key
+        self.headers = {"User-Agent": "MyDataCollector/1.0"}
+        if api_key:
+            self.headers["Authorization"] = f"Bearer {api_key}"
+    
+    def fetch_data(self, endpoint, params=None):
+        """Fetch data from a specific endpoint"""
+        url = f"{self.base_url}/{endpoint}"
+        try:
+            response = requests.get(url, headers=self.headers, params=params, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching {endpoint}: {e}")
+            return None
+    
+    def collect_multiple(self, endpoints, delay=1):
+        """Collect data from multiple endpoints"""
+        all_data = {}
+        for endpoint in endpoints:
+            print(f"Collecting from {endpoint}...")
+            data = self.fetch_data(endpoint)
+            if data:
+                all_data[endpoint] = data
+            time.sleep(delay)  # Respectful delay between requests
+        return all_data
+
+# Usage example
+collector = APICollector("https://api.example.com", api_key="YOUR_API_KEY")
+endpoints = ["users", "posts", "comments"]
+data = collector.collect_multiple(endpoints)
+
+# Save to file
+with open("collected_data.json", "w") as f:
+    json.dump(data, f, indent=2)
